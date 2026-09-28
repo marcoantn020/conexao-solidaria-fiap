@@ -1,0 +1,69 @@
+@page "/login"
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<PageTitle>Entrar — Conexão Solidária</PageTitle>
+
+<section class="auth-form">
+    <h1>Entrar</h1>
+    <p class="auth-form__lead">Acesse com sua conta de doador ou de gestor da ONG.</p>
+
+    @if (!string.IsNullOrEmpty(ReturnUrl))
+    {
+        <p class="form-info" role="status">Entre para continuar de onde parou.</p>
+    }
+
+    <EditForm Model="_form" OnValidSubmit="EntrarAsync" FormName="login">
+        <DataAnnotationsValidator />
+
+        <label for="email">E-mail</label>
+        <InputText id="email" type="email" @bind-Value="_form.Email" autocomplete="email" required />
+
+        <label for="senha">Senha</label>
+        <InputText id="senha" type="password" @bind-Value="_form.Senha" autocomplete="current-password" required />
+
+        @if (_erro is not null)
+        {
+            <p class="form-error" role="alert">@_erro</p>
+        }
+
+        <button class="btn btn-primary" type="submit" disabled="@_enviando">
+            @(_enviando ? "Entrando..." : "Entrar")
+        </button>
+    </EditForm>
+
+    <p class="auth-form__switch">Ainda não tem conta? <a href="/cadastro">Cadastre-se como doador</a>.</p>
+</section>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    private readonly LoginFormModel _form = new();
+    private bool _enviando;
+    private string? _erro;
+
+    private async Task EntrarAsync()
+    {
+        _enviando = true;
+        _erro = null;
+
+        var sucesso = await Auth.LoginAsync(_form.Email, _form.Senha);
+        _enviando = false;
+
+        if (!sucesso)
+        {
+            _erro = "E-mail ou senha inválidos.";
+            return;
+        }
+
+        var destino = string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : "/" + ReturnUrl.TrimStart('/');
+        Nav.NavigateTo(destino, forceLoad: false);
+    }
+
+    private class LoginFormModel
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Senha { get; set; } = string.Empty;
+    }
+}

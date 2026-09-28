@@ -1,0 +1,65 @@
+@page "/doar/{CampanhaId:guid}"
+@attribute [Authorize(Roles = "Doador")]
+@inject DoacoesClient Doacoes
+@inject NavigationManager Nav
+
+<PageTitle>Fazer doação — Conexão Solidária</PageTitle>
+
+<section class="auth-form">
+    <h1>Fazer uma doação</h1>
+    <p class="auth-form__lead">Informe o valor que deseja doar para esta campanha.</p>
+
+    <EditForm Model="_form" OnValidSubmit="DoarAsync" FormName="doar">
+        <label for="valor">Valor</label>
+        <CurrencyInput Id="valor" @bind-Value="_form.Valor" Required="true" />
+
+        @if (_erro is not null)
+        {
+            <p class="form-error" role="alert">@_erro</p>
+        }
+        @if (_sucesso)
+        {
+            <p class="form-success" role="status">
+                Obrigado pela sua doação! Ela será processada e o total da campanha atualizado em instantes.
+            </p>
+        }
+
+        <button class="btn btn-accent" type="submit" disabled="@(_enviando || _sucesso)">
+            @(_enviando ? "Enviando..." : "Confirmar doação")
+        </button>
+        <a class="btn btn-ghost" href="/">Voltar para as campanhas</a>
+    </EditForm>
+</section>
+
+@code {
+    [Parameter] public Guid CampanhaId { get; set; }
+
+    private readonly DoacaoFormModel _form = new();
+    private bool _enviando;
+    private bool _sucesso;
+    private string? _erro;
+
+    private async Task DoarAsync()
+    {
+        _enviando = true;
+        _erro = null;
+
+        var response = await Doacoes.DoarAsync(CampanhaId, _form.Valor);
+        _enviando = false;
+
+        if (response.IsSuccessStatusCode)
+        {
+            _sucesso = true;
+            return;
+        }
+
+        _erro = response.StatusCode is System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.Forbidden
+            ? "Sua sessão expirou. Saia e entre novamente para continuar."
+            : "Não foi possível registrar a doação. Verifique se a campanha ainda está ativa.";
+    }
+
+    private class DoacaoFormModel
+    {
+        public decimal Valor { get; set; }
+    }
+}

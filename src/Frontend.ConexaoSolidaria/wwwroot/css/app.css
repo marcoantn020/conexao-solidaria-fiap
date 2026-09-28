@@ -1,0 +1,592 @@
+/* ==========================================================================
+   Conexão Solidária — design tokens
+   Paleta: verde-esperança (base, confiança + solidariedade) + coral quente
+   (acento, CTAs de doação). Fundo levemente creme, nunca branco puro.
+   Tipografia: Fraunces (títulos, calorosa/humanista) + Inter (corpo/forms).
+   ========================================================================== */
+
+:root {
+    /* Cor — verde profundo (não o verde-menta genérico de SaaS) */
+    --color-primary: hsl(155, 45%, 28%);
+    --color-primary-dark: hsl(155, 50%, 18%);
+    --color-primary-light: hsl(155, 40%, 94%);
+
+    /* Cor — acento quente pra ações de doação */
+    --color-accent: hsl(16, 82%, 56%);
+    --color-accent-dark: hsl(16, 82%, 46%);
+
+    /* Neutros quentes */
+    --color-bg: hsl(40, 35%, 97%);
+    --color-surface: hsl(40, 25%, 100%);
+    --color-text: hsl(155, 15%, 14%);
+    --color-text-muted: hsl(155, 8%, 42%);
+    --color-border: hsl(155, 15%, 88%);
+
+    --color-error: hsl(0, 65%, 45%);
+    --color-error-bg: hsl(0, 65%, 96%);
+    --color-success: hsl(155, 45%, 28%);
+    --color-success-bg: hsl(155, 40%, 94%);
+
+    /* Tipografia */
+    --font-display: "Fraunces", ui-serif, Georgia, serif;
+    --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+    /* Espaçamento — grid de 8pt */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 16px;
+    --space-4: 24px;
+    --space-5: 32px;
+    --space-6: 48px;
+    --space-7: 64px;
+
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 2px hsl(155 15% 14% / 0.06), 0 1px 1px hsl(155 15% 14% / 0.04);
+    --shadow-md: 0 4px 12px hsl(155 15% 14% / 0.08), 0 2px 4px hsl(155 15% 14% / 0.05);
+}
+
+/* ==========================================================================
+   Reset & base
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.2;
+    margin: 0 0 var(--space-3);
+    color: var(--color-primary-dark);
+}
+
+h1 {
+    font-size: clamp(2rem, 1.6rem + 1.5vw, 2.75rem);
+    font-weight: 500;
+}
+
+h2 {
+    font-size: 1.375rem;
+}
+
+p {
+    margin: 0 0 var(--space-3);
+    max-width: 68ch;
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Loading shell (before Blazor boots)
+   ========================================================================== */
+
+.initial-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    min-height: 100vh;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+}
+
+.initial-loading .brand__mark {
+    font-size: 2rem;
+    animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+#blazor-error-ui {
+    background: var(--color-error-bg);
+    color: var(--color-error);
+    border-top: 1px solid var(--color-error);
+    bottom: 0;
+    box-shadow: var(--shadow-md);
+    display: none;
+    left: 0;
+    padding: var(--space-3) var(--space-6) var(--space-3) var(--space-3);
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: var(--space-3);
+    top: var(--space-3);
+}
+
+/* ==========================================================================
+   Layout shell
+   ========================================================================== */
+
+.app-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.site-header {
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.site-header__inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-primary-dark);
+}
+
+.brand:hover {
+    text-decoration: none;
+}
+
+.brand__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    background: var(--color-primary);
+    color: var(--color-surface);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.brand__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.15rem;
+}
+
+.site-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.site-nav a {
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.site-nav__user {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.site-main {
+    flex: 1;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4);
+}
+
+.site-footer {
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-4);
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+}
+
+.site-footer p {
+    margin: 0;
+    max-width: none;
+}
+
+/* ==========================================================================
+   Hero / page header
+   ========================================================================== */
+
+.hero {
+    max-width: 640px;
+    margin-bottom: var(--space-6);
+}
+
+.hero__lead {
+    color: var(--color-text-muted);
+    font-size: 1.125rem;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-4);
+}
+
+.page-header h1 {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Campanhas grid & card
+   ========================================================================== */
+
+.campanhas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-4);
+}
+
+.campanha-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.campanha-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.campanha-card h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.progress-bar {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--color-primary-light);
+    overflow: hidden;
+}
+
+.progress-bar__fill {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+.campanha-card__stats {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.campanha-card__stats strong {
+    color: var(--color-text);
+    font-size: 1rem;
+}
+
+.campanha-card__meta {
+    text-align: right;
+}
+
+.campanha-card__actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+/* ==========================================================================
+   Buttons — sized by importance (Fitts' Law: bigger primary targets)
+   ========================================================================== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-family: var(--font-body);
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+    height: 48px;
+    padding: 0 var(--space-4);
+    font-size: 1rem;
+}
+
+.btn:hover {
+    text-decoration: none;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-sm {
+    height: 40px;
+    padding: 0 var(--space-3);
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: var(--color-surface);
+}
+
+.btn-primary:hover {
+    background: var(--color-primary-dark);
+}
+
+.btn-accent {
+    background: var(--color-accent);
+    color: var(--color-surface);
+}
+
+.btn-accent:hover {
+    background: var(--color-accent-dark);
+}
+
+.btn-secondary {
+    background: var(--color-primary-light);
+    color: var(--color-primary-dark);
+}
+
+.btn-secondary:hover {
+    background: hsl(155, 40%, 88%);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+}
+
+.btn-ghost:hover {
+    background: var(--color-primary-light);
+}
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+
+.auth-form {
+    max-width: 440px;
+    margin: 0 auto;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
+}
+
+.auth-form--wide {
+    max-width: 620px;
+}
+
+.auth-form h1 {
+    text-align: center;
+}
+
+.auth-form__lead {
+    text-align: center;
+    color: var(--color-text-muted);
+}
+
+.auth-form__switch {
+    margin-top: var(--space-4);
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.auth-form form,
+.auth-form .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.form-row {
+    flex-direction: row !important;
+    gap: var(--space-3) !important;
+}
+
+.form-row>div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-top: var(--space-3);
+}
+
+input,
+textarea,
+select {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    padding: 0 var(--space-3);
+    height: 48px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+textarea {
+    height: auto;
+    padding: var(--space-3);
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.auth-form button[type="submit"] {
+    margin-top: var(--space-4);
+    width: 100%;
+}
+
+.form-error {
+    color: var(--color-error);
+    background: var(--color-error-bg);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.9rem;
+    margin-top: var(--space-3);
+    max-width: none;
+}
+
+.form-success {
+    color: var(--color-success);
+    background: var(--color-success-bg);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.9rem;
+    margin-top: var(--space-3);
+    max-width: none;
+}
+
+.form-info {
+    color: var(--color-primary-dark);
+    background: var(--color-primary-light);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-3);
+    max-width: none;
+}
+
+/* ==========================================================================
+   Status / empty states
+   ========================================================================== */
+
+.status-text {
+    color: var(--color-text-muted);
+}
+
+.status-text--erro {
+    color: var(--color-error);
+}
+
+.empty-state {
+    background: var(--color-surface);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-6);
+    text-align: center;
+    color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 640px) {
+    .site-header__inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+    }
+
+    .form-row {
+        flex-direction: column !important;
+    }
+}

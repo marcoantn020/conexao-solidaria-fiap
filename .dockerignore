@@ -1,0 +1,12 @@
+# .dockerignore
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+.claude/
+.git/
+.github/
+docs/
+k8s/
+*.md
+docker-compose.yml

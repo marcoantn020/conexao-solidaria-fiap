@@ -1,0 +1,48 @@
+@inherits LayoutComponentBase
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<div class="app-shell">
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a class="brand" href="/">
+                <span class="brand__mark">CS</span>
+                <span class="brand__name">Conexão Solidária</span>
+            </a>
+
+            <nav class="site-nav">
+                <AuthorizeView>
+                    <Authorized>
+                        <AuthorizeView Roles="GestorONG" Context="gestorContext">
+                            <Authorized>
+                                <a href="/campanhas">Gerenciar campanhas</a>
+                            </Authorized>
+                        </AuthorizeView>
+                        <span class="site-nav__user">@context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value</span>
+                        <button class="btn btn-ghost" @onclick="SairAsync">Sair</button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="/cadastro">Criar conta</a>
+                        <a class="btn btn-primary btn-sm" href="/login">Entrar</a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-main">
+        @Body
+    </main>
+
+    <footer class="site-footer">
+        <p>Conexão Solidária &mdash; MVP de gestão de doações da ONG Esperança Solidária.</p>
+    </footer>
+</div>
+
+@code {
+    private async Task SairAsync()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/", forceLoad: false);
+    }
+}

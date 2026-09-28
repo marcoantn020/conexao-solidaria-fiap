@@ -1,0 +1,38 @@
+# .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore ConexaoSolidaria.sln
+
+      - name: Build
+        run: dotnet build ConexaoSolidaria.sln --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test ConexaoSolidaria.sln --no-build --configuration Release --verbosity normal
+
+      - name: Build Docker image - Api.CampanhasUsuarios
+        run: docker build -f src/Api.CampanhasUsuarios/Dockerfile -t api-campanhas-usuarios:${{ github.sha }} .
+
+      - name: Build Docker image - Worker.Doacoes
+        run: docker build -f src/Worker.Doacoes/Dockerfile -t worker-doacoes:${{ github.sha }} .
+
+      - name: Build Docker image - Frontend.ConexaoSolidaria
+        run: docker build -f src/Frontend.ConexaoSolidaria/Dockerfile -t frontend-conexao-solidaria:${{ github.sha }} .

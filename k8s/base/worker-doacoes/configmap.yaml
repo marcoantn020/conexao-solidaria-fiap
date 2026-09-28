@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: worker-doacoes-config
+data:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  RabbitMq__HostName: "rabbitmq"
+  RabbitMq__Port: "5672"
+  RabbitMq__Fila: "doacao-recebida"
+  CampanhasApi__BaseUrl: "http://api-campanhas-usuarios"

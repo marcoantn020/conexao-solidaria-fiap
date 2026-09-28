@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - api-campanhas-usuarios/deployment.yaml
+  - api-campanhas-usuarios/service.yaml
+  - api-campanhas-usuarios/configmap.yaml
+  - api-campanhas-usuarios/secret.yaml
+  - worker-doacoes/deployment.yaml
+  - worker-doacoes/service.yaml
+  - worker-doacoes/configmap.yaml
+  - worker-doacoes/secret.yaml
+  - postgres-campanhas/deployment.yaml
+  - postgres-campanhas/service.yaml
+  - postgres-campanhas/pvc.yaml
+  - postgres-campanhas/secret.yaml
+  - postgres-doacoes/deployment.yaml
+  - postgres-doacoes/service.yaml
+  - postgres-doacoes/pvc.yaml
+  - postgres-doacoes/secret.yaml
+  - rabbitmq/deployment.yaml
+  - rabbitmq/service.yaml
+  - zabbix/deployment.yaml
+  - zabbix/service.yaml
+  - grafana/deployment.yaml
+  - grafana/service.yaml
+  - frontend/deployment.yaml
+  - frontend/service.yaml

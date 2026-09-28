@@ -1,0 +1,73 @@
+@page "/"
+@inject CampanhasClient Campanhas
+
+<PageTitle>Conexão Solidária — Campanhas ativas</PageTitle>
+
+<section class="hero">
+    <h1>Sua doação muda uma história.</h1>
+    <p class="hero__lead">
+        Acompanhe as campanhas ativas da Esperança Solidária e contribua com o que puder — cada
+        real arrecadado é repassado diretamente para quem precisa.
+    </p>
+</section>
+
+<section class="campanhas-grid" aria-label="Campanhas ativas">
+    @if (_carregando)
+    {
+        <p class="status-text">Carregando campanhas...</p>
+    }
+    else if (_erro is not null)
+    {
+        <p class="status-text status-text--erro">@_erro</p>
+    }
+    else if (_campanhas.Count == 0)
+    {
+        <div class="empty-state">
+            <p>Nenhuma campanha ativa no momento. Volte em breve!</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var campanha in _campanhas)
+        {
+            <article class="campanha-card">
+                <h2>@campanha.Titulo</h2>
+
+                <div class="progress-bar" role="progressbar" aria-valuenow="@campanha.PercentualAtingido" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar__fill" style="width:@(campanha.PercentualAtingido)%"></div>
+                </div>
+
+                <div class="campanha-card__stats">
+                    <span><strong>@FormatarMoeda(campanha.ValorArrecadado)</strong> arrecadados</span>
+                    <span class="campanha-card__meta">meta de @FormatarMoeda(campanha.MetaFinanceira)</span>
+                </div>
+
+                <a class="btn btn-accent" href="@($"/doar/{campanha.Id}")">Doar agora</a>
+            </article>
+        }
+    }
+</section>
+
+@code {
+    private List<CampanhaPublicaResponse> _campanhas = [];
+    private bool _carregando = true;
+    private string? _erro;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _campanhas = await Campanhas.ListarAtivasAsync();
+        }
+        catch (Exception)
+        {
+            _erro = "Não foi possível carregar as campanhas agora. Tente novamente em instantes.";
+        }
+        finally
+        {
+            _carregando = false;
+        }
+    }
+
+    private static string FormatarMoeda(decimal valor) => valor.ToString("C", new System.Globalization.CultureInfo("pt-BR"));
+}

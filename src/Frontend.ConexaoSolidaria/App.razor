@@ -1,0 +1,45 @@
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <div class="empty-state">
+                        @if (context.User.Identity?.IsAuthenticated == true)
+                        {
+                            <h1>Acesso não permitido</h1>
+                            <p>Sua conta não tem permissão para acessar esta página.</p>
+                            <a class="btn btn-primary" href="/">Voltar para a página inicial</a>
+                        }
+                        else
+                        {
+                            <h1>Você precisa entrar</h1>
+                            <p>Esta página exige login. Entre com sua conta para continuar.</p>
+                            <a class="btn btn-primary" href="@LoginUrlWithReturn()">Entrar</a>
+                        }
+                    </div>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Página não encontrada</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <div class="empty-state">
+                    <h1>Página não encontrada</h1>
+                    <p>O endereço acessado não existe.</p>
+                    <a class="btn btn-primary" href="/">Voltar para a página inicial</a>
+                </div>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+@code {
+    [Inject] private NavigationManager Nav { get; set; } = default!;
+
+    private string LoginUrlWithReturn()
+    {
+        var returnUrl = Nav.ToBaseRelativePath(Nav.Uri);
+        return $"/login?returnUrl={Uri.EscapeDataString(returnUrl)}";
+    }
+}

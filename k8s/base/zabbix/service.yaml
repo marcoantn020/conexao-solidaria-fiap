@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zabbix
+spec:
+  selector:
+    app: zabbix
+  ports:
+    - name: web
+      port: 80
+      targetPort: 80
+    - name: server
+      port: 10051
+      targetPort: 10051
+  type: ClusterIP

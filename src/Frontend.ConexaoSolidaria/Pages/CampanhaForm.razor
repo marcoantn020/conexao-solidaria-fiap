@@ -1,0 +1,96 @@
+@page "/campanhas/nova"
+@page "/campanhas/{Id:guid}/editar"
+@attribute [Authorize(Roles = "GestorONG")]
+@inject CampanhasClient Campanhas
+@inject NavigationManager Nav
+
+<PageTitle>@(EhEdicao ? "Editar campanha" : "Nova campanha") — Conexão Solidária</PageTitle>
+
+<section class="auth-form auth-form--wide">
+    <h1>@(EhEdicao ? "Editar campanha" : "Nova campanha")</h1>
+
+    @if (EhEdicao)
+    {
+        <p class="auth-form__lead">
+            Preencha novamente todos os campos abaixo — a edição substitui os dados atuais da campanha.
+        </p>
+    }
+
+    <EditForm Model="_form" OnValidSubmit="SalvarAsync" FormName="campanha-form">
+        <label for="titulo">Título</label>
+        <InputText id="titulo" @bind-Value="_form.Titulo" required />
+
+        <label for="descricao">Descrição</label>
+        <InputTextArea id="descricao" @bind-Value="_form.Descricao" rows="4" required />
+
+        <div class="form-row">
+            <div>
+                <label for="inicio">Início</label>
+                <InputDate id="inicio" @bind-Value="_form.DataInicio" required />
+            </div>
+            <div>
+                <label for="fim">Encerramento</label>
+                <InputDate id="fim" @bind-Value="_form.DataFim" required />
+            </div>
+        </div>
+
+        <label for="meta">Meta financeira</label>
+        <CurrencyInput Id="meta" @bind-Value="_form.MetaFinanceira" Required="true" />
+
+        @if (_erro is not null)
+        {
+            <p class="form-error" role="alert">@_erro</p>
+        }
+
+        <button class="btn btn-primary" type="submit" disabled="@_enviando">
+            @(_enviando ? "Salvando..." : "Salvar campanha")
+        </button>
+    </EditForm>
+</section>
+
+@code {
+    [Parameter] public Guid? Id { get; set; }
+
+    private bool EhEdicao => Id is not null;
+
+    private readonly CampanhaFormModel _form = new()
+    {
+        DataInicio = DateTime.Today,
+        DataFim = DateTime.Today.AddMonths(1)
+    };
+
+    private bool _enviando;
+    private string? _erro;
+
+    private async Task SalvarAsync()
+    {
+        _enviando = true;
+        _erro = null;
+
+        var request = new CampanhaRequest(
+            _form.Titulo, _form.Descricao, _form.DataInicio, _form.DataFim, _form.MetaFinanceira);
+
+        var response = EhEdicao
+            ? await Campanhas.EditarAsync(Id!.Value, request)
+            : await Campanhas.CriarAsync(request);
+
+        _enviando = false;
+
+        if (response.IsSuccessStatusCode)
+        {
+            Nav.NavigateTo("/", forceLoad: false);
+            return;
+        }
+
+        _erro = "Não foi possível salvar a campanha. Verifique as datas e o valor da meta.";
+    }
+
+    private class CampanhaFormModel
+    {
+        public string Titulo { get; set; } = string.Empty;
+        public string Descricao { get; set; } = string.Empty;
+        public DateTime DataInicio { get; set; }
+        public DateTime DataFim { get; set; }
+        public decimal MetaFinanceira { get; set; }
+    }
+}

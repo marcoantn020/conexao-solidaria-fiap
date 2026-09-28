@@ -1,0 +1,77 @@
+@page "/cadastro"
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<PageTitle>Criar conta — Conexão Solidária</PageTitle>
+
+<section class="auth-form">
+    <h1>Criar conta de doador</h1>
+    <p class="auth-form__lead">Cadastre-se para acompanhar e apoiar as campanhas da ONG.</p>
+
+    <EditForm Model="_form" OnValidSubmit="CadastrarAsync" FormName="cadastro">
+        <label for="nome">Nome completo</label>
+        <InputText id="nome" @bind-Value="_form.NomeCompleto" required />
+
+        <label for="cpf">CPF</label>
+        <InputText id="cpf" @bind-Value="_form.Cpf" placeholder="000.000.000-00" required />
+
+        <label for="email">E-mail</label>
+        <InputText id="email" type="email" @bind-Value="_form.Email" autocomplete="email" required />
+
+        <label for="senha">Senha</label>
+        <InputText id="senha" type="password" @bind-Value="_form.Senha" autocomplete="new-password" required />
+
+        @if (_erro is not null)
+        {
+            <p class="form-error" role="alert">@_erro</p>
+        }
+        @if (_sucesso)
+        {
+            <p class="form-success" role="status">Conta criada! Redirecionando para o login...</p>
+        }
+
+        <button class="btn btn-primary" type="submit" disabled="@_enviando">
+            @(_enviando ? "Enviando..." : "Criar conta")
+        </button>
+    </EditForm>
+
+    <p class="auth-form__switch">Já tem conta? <a href="/login">Entrar</a>.</p>
+</section>
+
+@code {
+    private readonly CadastroFormModel _form = new();
+    private bool _enviando;
+    private bool _sucesso;
+    private string? _erro;
+
+    private async Task CadastrarAsync()
+    {
+        _enviando = true;
+        _erro = null;
+
+        var response = await Http.PostAsJsonAsync("doadores", new CadastrarDoadorRequest(
+            _form.NomeCompleto, _form.Email, _form.Cpf, _form.Senha));
+
+        _enviando = false;
+
+        if (response.IsSuccessStatusCode)
+        {
+            _sucesso = true;
+            await Task.Delay(1200);
+            Nav.NavigateTo("/login", forceLoad: false);
+            return;
+        }
+
+        _erro = response.StatusCode == System.Net.HttpStatusCode.Conflict
+            ? "Este e-mail já está cadastrado."
+            : "Não foi possível concluir o cadastro. Verifique os dados informados.";
+    }
+
+    private class CadastroFormModel
+    {
+        public string NomeCompleto { get; set; } = string.Empty;
+        public string Cpf { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Senha { get; set; } = string.Empty;
+    }
+}

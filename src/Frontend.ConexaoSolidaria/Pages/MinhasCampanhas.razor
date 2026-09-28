@@ -1,0 +1,71 @@
+@page "/campanhas"
+@attribute [Authorize(Roles = "GestorONG")]
+@inject CampanhasClient Campanhas
+
+<PageTitle>Gerenciar campanhas — Conexão Solidária</PageTitle>
+
+<section class="page-header">
+    <h1>Gerenciar campanhas</h1>
+    <a class="btn btn-primary" href="/campanhas/nova">Nova campanha</a>
+</section>
+
+<p class="status-text">
+    Esta lista mostra as campanhas atualmente ativas e dentro do prazo — a mesma exibida
+    publicamente na página inicial.
+</p>
+
+@if (_carregando)
+{
+    <p class="status-text">Carregando...</p>
+}
+else if (_campanhas.Count == 0)
+{
+    <div class="empty-state">
+        <p>Nenhuma campanha ativa. <a href="/campanhas/nova">Crie a primeira</a>.</p>
+    </div>
+}
+else
+{
+    <div class="campanhas-grid">
+        @foreach (var campanha in _campanhas)
+        {
+            <article class="campanha-card">
+                <h2>@campanha.Titulo</h2>
+
+                <div class="progress-bar" role="progressbar" aria-valuenow="@campanha.PercentualAtingido" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar__fill" style="width:@(campanha.PercentualAtingido)%"></div>
+                </div>
+
+                <div class="campanha-card__stats">
+                    <span><strong>@campanha.PercentualAtingido%</strong> da meta</span>
+                </div>
+
+                <div class="campanha-card__actions">
+                    <a class="btn btn-secondary btn-sm" href="@($"/campanhas/{campanha.Id}/editar")">Editar</a>
+                    <button class="btn btn-ghost btn-sm" @onclick="() => EncerrarAsync(campanha.Id)">Encerrar</button>
+                </div>
+            </article>
+        }
+    </div>
+}
+
+@code {
+    private List<CampanhaPublicaResponse> _campanhas = [];
+    private bool _carregando = true;
+
+    protected override async Task OnInitializedAsync() => await CarregarAsync();
+
+    private async Task CarregarAsync()
+    {
+        _carregando = true;
+        _campanhas = await Campanhas.ListarAtivasAsync();
+        _carregando = false;
+    }
+
+    private async Task EncerrarAsync(Guid id)
+    {
+        var response = await Campanhas.AtualizarStatusAsync(id, StatusCampanha.Concluida);
+        if (response.IsSuccessStatusCode)
+            await CarregarAsync();
+    }
+}

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: worker-doacoes-secret
+type: Opaque
+stringData:
+  ConnectionStrings__DoacoesDb: "SUBSTITUIDO-PELO-TERRAFORM: Host=<rds-endpoint-output-do-terraform>;Port=5432;Database=doacoes;Username=<usuario>;Password=<senha-do-secrets-manager>"

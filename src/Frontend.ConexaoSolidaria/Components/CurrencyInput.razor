@@ -1,0 +1,36 @@
+@* Input de moeda com máscara: usuário digita só dígitos, o campo formata como
+   "R$ 1.234,56" a cada tecla (o valor sempre é interpretado em centavos). *@
+
+<input type="text"
+       inputmode="numeric"
+       id="@Id"
+       class="@CssClass"
+       placeholder="R$ 0,00"
+       value="@Exibicao"
+       required="@Required"
+       @oninput="OnInputAsync" />
+
+@code {
+    [Parameter] public decimal Value { get; set; }
+    [Parameter] public EventCallback<decimal> ValueChanged { get; set; }
+    [Parameter] public string? Id { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public bool Required { get; set; }
+
+    private string Exibicao => Value == 0
+        ? string.Empty
+        : Value.ToString("C", new System.Globalization.CultureInfo("pt-BR"));
+
+    private async Task OnInputAsync(ChangeEventArgs e)
+    {
+        var digitos = new string((e.Value?.ToString() ?? string.Empty).Where(char.IsDigit).ToArray());
+        var centavos = digitos.Length == 0 ? 0L : long.Parse(digitos);
+        var novoValor = centavos / 100m;
+
+        if (novoValor == Value)
+            return;
+
+        Value = novoValor;
+        await ValueChanged.InvokeAsync(novoValor);
+    }
+}
