@@ -205,4 +205,3 @@ separado (ver [ADR-007](docs/adr/ADR-007-infraestrutura-aws-terraform.md)). O ov
 Kubernetes usado nesse ambiente (`k8s/overlays/aws/`) está documentado em
 `k8s/overlays/aws/README.md` — este repositório não provisiona nem aplica esse overlay
 sozinho, apenas fornece a estrutura que o repositório de infraestrutura consome.
-
